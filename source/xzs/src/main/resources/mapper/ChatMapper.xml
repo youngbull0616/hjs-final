@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.ChatMapper">
+    <!-- 更新 BaseResultMap 以匹配 t_chat 表的真实字段 -->
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.Chat">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+        <result column="message" jdbcType="VARCHAR" property="message" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, send_time, message
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_chat
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from t_chat
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 插入操作需要移除不存在于 t_chat 表中的字段 -->
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.Chat" useGeneratedKeys="true" keyProperty="id">
+        insert into t_chat (id, user_id, send_time, message)
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{sendTime,jdbcType=TIMESTAMP}, #{message,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.mindskip.xzs.domain.Chat" useGeneratedKeys="true" keyProperty="id">
+        insert into t_chat
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="chat.userId != null">
+                user_id,
+            </if>
+            <if test="chat.message != null">
+                message,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="chat.userId != null">
+                #{chat.userId,jdbcType=INTEGER},
+            </if>
+            <if test="chat.message != null">
+                #{chat.message,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+
+    <!-- 更新操作需移除无效字段 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.mindskip.xzs.domain.Chat">
+        update t_chat
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="sendTime != null">
+                send_time = #{sendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="message != null">
+                message = #{message,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!-- updateByPrimaryKey 需要移除无效字段 -->
+    <update id="updateByPrimaryKey" parameterType="com.mindskip.xzs.domain.Chat">
+        update t_chat
+        set user_id = #{userId,jdbcType=INTEGER},
+            send_time = #{sendTime,jdbcType=TIMESTAMP},
+            message = #{message,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="findChats" resultMap="BaseResultMap" parameterType="com.mindskip.xzs.viewmodel.admin.chat.ChatPageRequestVM">
+        SELECT
+            *
+        FROM t_chat
+    </select>
+
+</mapper>

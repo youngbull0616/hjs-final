@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.FileMapper">
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.FileDomain">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="file_url" jdbcType="VARCHAR" property="fileURL" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="course_id" jdbcType="INTEGER" property="courseId" />
+        <result column="is_deleted" jdbcType="INTEGER" property="isDeleted" />
+        <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, file_url, status, course_id, is_deleted, file_name
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_file
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from t_file
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 插入操作需要移除不存在于 t_file 表中的字段 -->
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.FileDomain" useGeneratedKeys="true" keyProperty="id">
+        insert into t_file (id, user_id, file_url, status, course_id, is_deleted, file_name)
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{fileURL,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{courseId,jdbcType=INTEGER}, #{isDeleted,jdbcType=INTEGER}, #{fileName,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.mindskip.xzs.domain.FileDomain" useGeneratedKeys="true" keyProperty="id">
+        insert into t_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="fileURL != null">
+                file_url,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="courseId != null">
+                course_id,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="fileName != null">
+                is_deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="fileURL != null">
+                #{fileURL,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="courseId != null">
+                #{courseId,jdbcType=INTEGER},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=INTEGER},
+            </if>
+            <if test="fileName != null">
+                #{fileName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+
+    <insert id="uploadFile" parameterType="com.mindskip.xzs.domain.FileDomain">
+        insert into t_file (user_id, file_url, status, course_id, is_deleted, file_name)
+        values (#{userId}, #{fileURL}, #{status}, #{courseId}, #{isDeleted}, #{fileName})
+    </insert>
+
+    <select id="getFilesByCourseId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from t_file
+        where course_id = #{courseId} and is_deleted = 0
+    </select>
+
+    <update id="setDeleted" parameterType="java.lang.Integer">
+        update t_file
+        set is_deleted = 1
+        where id = #{id}
+    </update>
+
+</mapper>
